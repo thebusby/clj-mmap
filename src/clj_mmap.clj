@@ -39,17 +39,11 @@
   ([^String filename map-mode]
    (let [fis  (java.io.FileInputStream. filename)
          fc   (.getChannel fis)
-         size (.size fc)]
-     (Mmap. fis 
-            fc 
-            (reduce (fn [agg pos] (conj agg
-                                        (.map fc 
-                                              (map-modes map-mode)
-                                              pos 
-                                              (min bytes-per-map 
-                                                   (- size pos)))))
-                    []
-                    (range 0 size bytes-per-map))))))
+         size (.size fc)
+         mmap (fn [pos n] (.map fc (map-modes map-mode) pos n))]
+     (Mmap. fis fc (mapv #(mmap % (min (- size %)
+                                       bytes-per-map)) 
+                         (range 0 size bytes-per-map))))))
 
 (defn get-bytes ^bytes [mmap pos n]
   "Retrieve n bytes from mmap, at byte position pos."
@@ -60,7 +54,7 @@
                         int
                         inc
                         (* bytes-per-map))
-        read-size   (- (min end chunk-term) 
+        read-size   (- (min end chunk-term) ;; bytes to read in first chunk
                        pos)
         start-chunk (get-chunk pos)
         end-chunk   (get-chunk end)
