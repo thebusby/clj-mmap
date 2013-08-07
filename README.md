@@ -9,9 +9,9 @@ A Clojure library designed to allow you to easily mmap files via Java's NIO, and
 
 ## Usage
 ```clojure
-(with-open [mapped-file (clj-mmap/get-mmap "/tmp/big_file.txt"))]
-  (def some-bytes (clj-mmap/get-bytes mapped-file 0 30))
-  (println ("First 30 bytes of file, '"(String. some-bytes "UTF-8") "'"))
+(with-open [mapped-file (clj-mmap/get-mmap "/tmp/big_file.txt")]
+  (let [some-bytes (clj-mmap/get-bytes mapped-file 0 30)]
+    (println (str "First 30 bytes of file, '" (String. some-bytes "UTF-8") "'"))))
 ```
 
 
@@ -49,6 +49,6 @@ With Maven:
 CC0
 http://creativecommons.org/publicdomain/zero/1.0/
 
-I'd also like to thank my employer Gracenote, for allowing me to create this open source port.
+I'd also like to thank my employer, Gracenote, for allowing me to create this open source port.
 
 Copyright (C) 2012-2013 Alan Busby
