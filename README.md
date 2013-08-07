@@ -1,5 +1,5 @@
 Available via [clojars](http://clojars.org/search?q=clj-mmap)   
-Current stable version: [clj-mmap "1.0.0"]
+Current stable version: [clj-mmap "1.1.0"]
 
 
 # clj-mmap
@@ -32,7 +32,7 @@ If you are using Maven, add the following repository definition to your `pom.xml
 
 With Leiningen:
 
-    [clj-mmap "1.0.0"]
+    [clj-mmap "1.1.0"]
 
 
 With Maven:
@@ -40,7 +40,7 @@ With Maven:
     <dependency>
       <groupId>clj-mmap</groupId>
       <artifactId>clj-mmap</artifactId>
-      <version>1.0.0</version>
+      <version>1.1.0</version>
     </dependency>
 
 
