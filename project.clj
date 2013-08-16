@@ -1,4 +1,4 @@
-(defproject clj-mmap "1.1.1"
+(defproject clj-mmap "1.1.2"
   :description "A wrapper over java.nio's mmap() implementation to ease use, and enable mmap'ing files larger than 2GB."
   :url "https://github.com/thebusby/clj-mmap"
   :license {:name "MIT"

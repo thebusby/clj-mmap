@@ -9,7 +9,7 @@
 (definterface ISize
   (^long size []))
 
-(deftype Mmap [^java.io.FileInputStream fis ^java.nio.channels.FileChannel fc maps]  
+(deftype Mmap [^java.io.RandomAccessFile fis ^java.nio.channels.FileChannel fc maps]  
   ISize
   (size [this] (.size fc))
 
@@ -32,12 +32,17 @@
    :read-only  java.nio.channels.FileChannel$MapMode/READ_ONLY 
    :read-write java.nio.channels.FileChannel$MapMode/READ_WRITE})
 
+(def ^:private map-perms
+  {:private    "r"
+   :read-only  "r"
+   :read-write "rw"})
+
 (defn get-mmap 
   "Provided a filename, mmap the entire file, and return an opaque type to allow further access.
    Remember to use with-open, or to call .close, to clean up memory and open file descriptors."
   ([^String filename] (get-mmap filename :read-only))
   ([^String filename map-mode]
-   (let [fis  (java.io.FileInputStream. filename)
+   (let [fis  (java.io.RandomAccessFile. filename (map-perms map-mode))
          fc   (.getChannel fis)
          size (.size fc)
          mmap (fn [pos n] (.map fc (map-modes map-mode) pos n))]
@@ -56,8 +61,8 @@
                         (* bytes-per-map))
         read-size   (- (min end chunk-term) ;; bytes to read in first chunk
                        pos)
-        start-chunk (get-chunk pos)
-        end-chunk   (get-chunk end)
+        start-chunk ^java.nio.MappedByteBuffer (get-chunk pos)
+        end-chunk   ^java.nio.MappedByteBuffer (get-chunk end)
         buf         (byte-array n)]
 
     (locking start-chunk 
@@ -75,7 +80,7 @@
 (defn put-bytes
   "Write n bytes from buf into mmap, at byte position pos.
    If n isn't provided, the size of the buffer provided is used."
-  ([mmap ^bytes buf pos] (put-bytes buf pos (.size buf)))
+  ([mmap ^bytes buf pos] (put-bytes mmap buf pos (alength buf)))
   ([mmap ^bytes buf pos n]
      (let [get-chunk   #(nth mmap (int (/ % bytes-per-map)))
            end         (+ pos n)
@@ -86,8 +91,8 @@
                            (* bytes-per-map))
            write-size   (- (min end chunk-term) 
                           pos)
-           start-chunk (get-chunk pos)
-           end-chunk   (get-chunk end)]
+           start-chunk ^java.nio.MappedByteBuffer (get-chunk pos)
+           end-chunk   ^java.nio.MappedByteBuffer (get-chunk end)]
 
        (locking start-chunk 
          (.position start-chunk (mod pos bytes-per-map))
