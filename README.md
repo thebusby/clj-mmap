@@ -1,4 +1,4 @@
-Available via [clojars](https://clojars.org/clj-mmap)
+Available via [clojars](https://clojars.org/clj-mmap)   
 Current stable version: [clj-mmap "1.1.2"]
 
 
